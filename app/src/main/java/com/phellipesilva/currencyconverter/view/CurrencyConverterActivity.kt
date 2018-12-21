@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.phellipesilva.currencyconverter.R
 import com.phellipesilva.currencyconverter.dependencyInjection.injector
 import kotlinx.android.synthetic.main.activity_main.*
@@ -18,6 +19,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initializeViewModel(savedInstanceState)
         initializeRecyclerView()
+        initializeViewStateObserver()
     }
 
     private fun initializeRecyclerView() {
@@ -35,5 +37,11 @@ class CurrencyConverterActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this, currencyConverterViewModelFactory).get(CurrencyConverterViewModel::class.java)
 
         if (savedInstanceState == null) viewModel.startCurrencyRatesUpdate()
+    }
+
+    private fun initializeViewStateObserver() {
+        viewModel.viewState().observe(this, Observer {
+            Snackbar.make(coordinatorLayout, getString(R.string.activity_error_msg), Snackbar.LENGTH_LONG).show()
+        })
     }
 }
