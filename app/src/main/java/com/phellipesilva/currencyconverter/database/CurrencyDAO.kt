@@ -1,5 +1,6 @@
 package com.phellipesilva.currencyconverter.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
@@ -13,5 +14,5 @@ interface CurrencyDAO {
     fun save(currencyRates: CurrencyRates)
 
     @Query("SELECT * FROM currencyRates")
-    fun getCurrencyRates(): CurrencyRates
+    fun getCurrencyRates(): LiveData<CurrencyRates>
 }
