@@ -8,5 +8,5 @@ import retrofit2.http.Query
 interface CurrencyRatesService {
 
     @GET("latest")
-    fun getRates(@Query("baseRate") baseRate: String): Observable<CurrencyRates>
+    fun getRates(@Query("base") baseRate: String): Observable<CurrencyRates>
 }

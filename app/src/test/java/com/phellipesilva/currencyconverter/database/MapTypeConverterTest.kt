@@ -24,14 +24,14 @@ class MapTypeConverterTest {
     fun shouldPerformASimpleMapConversionWhenMapHasOneElement() {
         val returnedString = mapTypeConverter.fromMapToString(mapOf("Key" to 1.5))
 
-        assertThat(returnedString).isEqualTo("{\"Key\":1.5}")
+        assertThat(returnedString).isEqualTo("""{"Key":1.5}""")
     }
 
     @Test
     fun shouldPerformAMapConversionWhenMapHasNElements() {
         val returnedString = mapTypeConverter.fromMapToString(mapOf("Key1" to 1.0, "Ke2" to 1.2, "Key3" to 1.5))
 
-        assertThat(returnedString).isEqualTo("{\"Key1\":1.0,\"Ke2\":1.2,\"Key3\":1.5}")
+        assertThat(returnedString).isEqualTo("""{"Key1":1.0,"Ke2":1.2,"Key3":1.5}""")
     }
 
     @Test
@@ -43,14 +43,14 @@ class MapTypeConverterTest {
 
     @Test
     fun shouldPerformASimpleStringConversionWhenStringHasOneElement() {
-        val returnedMap = mapTypeConverter.fromStringToMap("{\"Key\":1.5}")
+        val returnedMap = mapTypeConverter.fromStringToMap("""{"Key":1.5}""")
 
         assertThat(returnedMap).isEqualTo(mapOf("Key" to 1.5))
     }
 
     @Test
     fun shouldPerformAStringConversionWhenStringHasNElements() {
-        val returnedMap = mapTypeConverter.fromStringToMap("{\"Key1\":1.0,\"Ke2\":1.2,\"Key3\":1.5}")
+        val returnedMap = mapTypeConverter.fromStringToMap("""{"Key1":1.0,"Ke2":1.2,"Key3":1.5}""")
 
         assertThat(returnedMap).isEqualTo(mapOf("Key1" to 1.0, "Ke2" to 1.2, "Key3" to 1.5))
     }
