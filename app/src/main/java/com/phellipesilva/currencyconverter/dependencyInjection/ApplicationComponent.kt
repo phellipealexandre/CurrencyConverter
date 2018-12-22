@@ -1,7 +1,7 @@
 package com.phellipesilva.currencyconverter.dependencyInjection
 
 import android.content.Context
-import com.phellipesilva.currencyconverter.view.CurrencyConverterViewModelFactory
+import com.phellipesilva.currencyconverter.view.viewModel.CurrencyConverterViewModelFactory
 import dagger.BindsInstance
 import dagger.Component
 

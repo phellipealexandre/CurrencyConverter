@@ -1,4 +1,4 @@
-package com.phellipesilva.currencyconverter.view
+package com.phellipesilva.currencyconverter.view.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

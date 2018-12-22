@@ -5,9 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.phellipesilva.currencyconverter.R
 import com.phellipesilva.currencyconverter.dependencyInjection.injector
+import com.phellipesilva.currencyconverter.view.recyclerView.CurrencyRatesAdapter
+import com.phellipesilva.currencyconverter.view.viewModel.CurrencyConverterViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 class CurrencyConverterActivity : AppCompatActivity() {
@@ -23,9 +26,15 @@ class CurrencyConverterActivity : AppCompatActivity() {
     }
 
     private fun initializeRecyclerView() {
-        val adapter = CurrencyRatesAdapter( this)
+        val adapter = CurrencyRatesAdapter(this)
+        adapter.setOnPositionChangedListener {
+            viewModel.updatesRateOrderMask(it.map { it.rateName })
+            recyclerView.scrollToPosition(0)
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+        (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         viewModel.currencyRates().observe(this, Observer {
             it?.let { adapter.updateData(it) }
