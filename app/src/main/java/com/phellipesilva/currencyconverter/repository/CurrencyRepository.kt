@@ -17,8 +17,8 @@ class CurrencyRepository @Inject constructor(
         return currencyDAO.getCurrencyRates()
     }
 
-    fun fetchCurrencyRates(): Observable<CurrencyRates> {
-        return currencyRatesService.getRates("EUR")
+    fun fetchCurrencyRates(baseRate: String): Observable<CurrencyRates> {
+        return currencyRatesService.getRates(baseRate)
     }
 
     fun updatesDatabase(currencyRates: CurrencyRates) {

@@ -11,11 +11,13 @@ import com.phellipesilva.currencyconverter.models.Rate
 import kotlinx.android.synthetic.main.currency_rate_list_item.view.*
 import java.util.*
 import androidx.recyclerview.widget.DiffUtil
+import java.text.DecimalFormat
 
 class CurrencyRatesAdapter(
     private val context: Context
 ) : RecyclerView.Adapter<CurrencyRatesAdapter.CurrencyRatesViewHolder>() {
 
+    private val doubleTwoDigitsFormat = "0.00"
     private var currencyRatesList = LinkedList<Rate>()
     private lateinit var onChangedListener: (List<Rate>) -> Unit
 
@@ -32,7 +34,7 @@ class CurrencyRatesAdapter(
     override fun onBindViewHolder(holder: CurrencyRatesViewHolder, position: Int) {
         val rate = currencyRatesList[position]
         holder.txtRateName.text = rate.rateName
-        holder.txtRateValue.text = rate.rateValue.toString()
+        holder.txtRateValue.text = DecimalFormat(doubleTwoDigitsFormat).format(rate.rateValue)
 
         holder.itemView.setOnClickListener { moveToRateListFirstIndex(position) }
     }

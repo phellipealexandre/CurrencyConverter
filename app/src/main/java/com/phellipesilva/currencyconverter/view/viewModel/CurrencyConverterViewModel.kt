@@ -17,8 +17,9 @@ import javax.inject.Inject
 @Reusable
 class CurrencyConverterViewModel @Inject constructor(private val currencyRepository: CurrencyRepository) : ViewModel() {
 
+    private var currentBaseRate = "EUR"
     private var disposable = Disposables.empty()
-    private var rateOrderMask = listOf<String>()
+    private var rateOrderMask = listOf(currentBaseRate)
 
     private val currencyRates by lazy { currencyRepository.getCurrencyRates() }
     private val viewState = MutableLiveData<ViewState>()
@@ -33,18 +34,24 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
     fun startCurrencyRatesUpdate() {
         disposable = Observable
             .interval(1, TimeUnit.SECONDS)
-            .switchMap { currencyRepository.fetchCurrencyRates() }
-            .subscribe({
-                currencyRepository.updatesDatabase(it)
-                setMaskInitialValue(it)
-            }, {
+            .switchMap { currencyRepository.fetchCurrencyRates(rateOrderMask.first()) }
+            .doOnNext(::setMaskInitialValue)
+            .subscribe(currencyRepository::updatesDatabase) {
                 emitsErrorState()
-            })
+            }
     }
 
     fun currencyRates(): LiveData<List<Rate>> {
         return Transformations.map(currencyRates) { currencyRates ->
-            rateOrderMask.map { Rate(it, currencyRates.rates.getValue(it)) }
+            rateOrderMask.map {
+                val currentBaseRateValue = 100.0
+
+                val currentRateValue = if (currencyRates.rates.containsKey(it)) {
+                    currencyRates.rates.getValue(it).times(currentBaseRateValue)
+                } else { currentBaseRateValue }
+
+                Rate(it, currentRateValue)
+            }
         }
     }
 
@@ -58,8 +65,8 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
 
     private fun setMaskInitialValue(currencyRates: CurrencyRates?) {
         currencyRates?.let { _ ->
-            if (rateOrderMask.isEmpty()) {
-                rateOrderMask = currencyRates.rates.map { it.key }
+            if (rateOrderMask.size == 1) {
+                rateOrderMask = listOf(currencyRates.base) + currencyRates.rates.map { it.key }
             }
         }
     }

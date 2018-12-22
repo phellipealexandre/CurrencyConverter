@@ -55,7 +55,7 @@ class CurrencyRepositoryTest {
         val observable = Observable.just(expectedCurrencyRates)
         `when`(currencyRatesService.getRates("EUR")).thenReturn(observable)
 
-        val currencyRatesObservable = currencyRepository.fetchCurrencyRates()
+        val currencyRatesObservable = currencyRepository.fetchCurrencyRates("EUR")
         val testObserver = TestObserver<CurrencyRates>()
         currencyRatesObservable.subscribe(testObserver)
 
