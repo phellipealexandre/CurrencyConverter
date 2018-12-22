@@ -17,16 +17,16 @@ import javax.inject.Inject
 @Reusable
 class CurrencyConverterViewModel @Inject constructor(private val currencyRepository: CurrencyRepository) : ViewModel() {
 
+    private var rateOrderMask: List<String>? = null
     private var currentBaseRate = Rate("EUR", 100.0)
     private var disposable = Disposables.empty()
-    private var rateOrderMask = listOf(currentBaseRate.rateName)
 
     private val currencyRates by lazy { currencyRepository.getCurrencyRates() }
     private val viewState = MutableLiveData<ViewState>()
 
     override fun onCleared() {
-        disposable.dispose()
         super.onCleared()
+        disposable.dispose()
     }
 
     fun viewState(): LiveData<ViewState> = viewState
@@ -34,21 +34,18 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
     fun startCurrencyRatesUpdate() {
         disposable = Observable
             .interval(1, TimeUnit.SECONDS)
-            .switchMap { currencyRepository.fetchCurrencyRates(rateOrderMask.first()) }
-            .doOnNext(::setMaskInitialValue)
+            .switchMap { currencyRepository.fetchCurrencyRates(currentBaseRate.rateName) }
+            .doOnNext(::initMaskAndBaseRate)
             .subscribe(currencyRepository::updatesDatabase) {
                 emitsErrorState()
             }
     }
 
-    fun currencyRates(): LiveData<List<Rate>> {
+    fun getObservableListOfRates(): LiveData<List<Rate>> {
         return Transformations.map(currencyRates) { currencyRates ->
-            rateOrderMask.map {
-                val currentRateValue = if (currencyRates.rates.containsKey(it)) {
-                    currencyRates.rates.getValue(it).times(currentBaseRate.rateValue)
-                } else { currentBaseRate.rateValue }
-
-                Rate(it, currentRateValue)
+            currencyRates?.let {
+                initMaskAndBaseRate(it)
+                transformCurrencyRatesToListApplyingMask(it)
             }
         }
     }
@@ -61,15 +58,26 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
         startCurrencyRatesUpdate()
     }
 
+    private fun transformCurrencyRatesToListApplyingMask(currencyRates: CurrencyRates): List<Rate>? {
+        return rateOrderMask?.map {
+            val currentRateValueMultipliedByBase = if (currencyRates.rates.containsKey(it)) {
+                currencyRates.rates.getValue(it).times(currentBaseRate.rateValue)
+            } else {
+                currentBaseRate.rateValue
+            }
+
+            Rate(it, currentRateValueMultipliedByBase)
+        }
+    }
+
     private fun emitsErrorState() {
         viewState.postValue(ViewState.ERROR)
     }
 
-    private fun setMaskInitialValue(currencyRates: CurrencyRates?) {
-        currencyRates?.let { _ ->
-            if (rateOrderMask.size == 1) {
-                rateOrderMask = listOf(currencyRates.base) + currencyRates.rates.map { it.key }
-            }
+    private fun initMaskAndBaseRate(currencyRatesFromDatabase: CurrencyRates?) {
+        if (rateOrderMask == null && currencyRatesFromDatabase != null) {
+            rateOrderMask = listOf(currencyRatesFromDatabase.base) + currencyRatesFromDatabase.rates.map { it.key }
+            currentBaseRate = Rate(currencyRatesFromDatabase.base, 100.0)
         }
     }
 }

@@ -25,6 +25,13 @@ class CurrencyConverterActivity : AppCompatActivity() {
         initializeViewStateObserver()
     }
 
+    private fun initializeViewModel(savedInstanceState: Bundle?) {
+        val currencyConverterViewModelFactory = injector.getCurrencyConverterViewModelFactory()
+        viewModel = ViewModelProviders.of(this, currencyConverterViewModelFactory).get(CurrencyConverterViewModel::class.java)
+
+        if (savedInstanceState == null) viewModel.startCurrencyRatesUpdate()
+    }
+
     private fun initializeRecyclerView() {
         val adapter = CurrencyRatesAdapter(this)
         adapter.setOnPositionChangedListener {
@@ -36,16 +43,9 @@ class CurrencyConverterActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        viewModel.currencyRates().observe(this, Observer {
+        viewModel.getObservableListOfRates().observe(this, Observer {
             it?.let { adapter.updateData(it) }
         })
-    }
-
-    private fun initializeViewModel(savedInstanceState: Bundle?) {
-        val currencyConverterViewModelFactory = injector.getCurrencyConverterViewModelFactory()
-        viewModel = ViewModelProviders.of(this, currencyConverterViewModelFactory).get(CurrencyConverterViewModel::class.java)
-
-        if (savedInstanceState == null) viewModel.startCurrencyRatesUpdate()
     }
 
     private fun initializeViewStateObserver() {

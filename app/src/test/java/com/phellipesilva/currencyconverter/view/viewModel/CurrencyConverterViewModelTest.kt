@@ -115,7 +115,7 @@ class CurrencyConverterViewModelTest {
         val currencyRateLiveData = MutableLiveData<CurrencyRates>()
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
-        currencyConverterViewModel.currencyRates().observeForever {
+        currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).isNull()
         }
     }
@@ -137,7 +137,7 @@ class CurrencyConverterViewModelTest {
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
-        currencyConverterViewModel.currencyRates().observeForever {
+        currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(2)
             assertThat(it).containsExactly(
                 Rate("base", 100.0),
@@ -160,7 +160,7 @@ class CurrencyConverterViewModelTest {
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
-        currencyConverterViewModel.currencyRates().observeForever {
+        currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(2)
             assertThat(it).containsExactly(
                 Rate("base", 100.0),
@@ -183,7 +183,7 @@ class CurrencyConverterViewModelTest {
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
-        currencyConverterViewModel.currencyRates().observeForever {
+        currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(4)
             assertThat(it).containsExactly(
                 Rate("base", 100.0),
@@ -210,7 +210,7 @@ class CurrencyConverterViewModelTest {
             )
         )
 
-        currencyConverterViewModel.currencyRates().observeForever {
+        currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(4)
             assertThat(it).containsExactly(
                 Rate("base", 100.0),
@@ -235,7 +235,7 @@ class CurrencyConverterViewModelTest {
             )
         )
 
-        currencyConverterViewModel.currencyRates().observeForever {
+        currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(2)
             assertThat(it).containsExactly(
                 Rate("base", 100.0),
