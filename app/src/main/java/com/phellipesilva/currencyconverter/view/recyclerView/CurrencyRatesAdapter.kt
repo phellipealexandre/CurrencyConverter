@@ -2,8 +2,10 @@ package com.phellipesilva.currencyconverter.view.recyclerView
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.phellipesilva.currencyconverter.R
@@ -11,6 +13,7 @@ import com.phellipesilva.currencyconverter.models.Rate
 import kotlinx.android.synthetic.main.currency_rate_list_item.view.*
 import java.util.*
 import androidx.recyclerview.widget.DiffUtil
+import com.phellipesilva.currencyconverter.view.extensions.requestFocusWithKeyboard
 import java.text.DecimalFormat
 
 class CurrencyRatesAdapter(
@@ -34,9 +37,9 @@ class CurrencyRatesAdapter(
     override fun onBindViewHolder(holder: CurrencyRatesViewHolder, position: Int) {
         val rate = currencyRatesList[position]
         holder.txtRateName.text = rate.rateName
-        holder.txtRateValue.text = DecimalFormat(doubleTwoDigitsFormat).format(rate.rateValue)
+        holder.edtRateValue.setText(DecimalFormat(doubleTwoDigitsFormat).format(rate.rateValue))
 
-        holder.itemView.setOnClickListener { moveToRateListFirstIndex(position) }
+        holder.itemView.setOnClickListener { moveToRateListFirstIndex(holder, position) }
     }
 
     fun updateData(newRates: List<Rate>) {
@@ -51,10 +54,12 @@ class CurrencyRatesAdapter(
         this.onChangedListener = listener
     }
 
-    private fun moveToRateListFirstIndex(position: Int) {
+    private fun moveToRateListFirstIndex(holder: CurrencyRatesViewHolder, position: Int) {
         val rate = currencyRatesList.removeAt(position)
         currencyRatesList.addFirst(rate)
         notifyItemMoved(position, 0)
+
+        holder.edtRateValue.requestFocusWithKeyboard()
 
         if (::onChangedListener.isInitialized) {
             onChangedListener.invoke(currencyRatesList)
@@ -63,7 +68,7 @@ class CurrencyRatesAdapter(
 
     class CurrencyRatesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtRateName: TextView = view.txtRateName
-        val txtRateValue: TextView = view.txtRateValue
+        val edtRateValue: EditText = view.edtRateValue
     }
 }
 

@@ -4,7 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="80dp"
+    android:clickable="true"
+    android:focusable="true"
     android:orientation="vertical">
 
     <TextView
@@ -21,17 +23,21 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="EUR" />
 
-    <TextView
-        android:id="@+id/txtRateValue"
+    <EditText
+        android:id="@+id/edtRateValue"
         android:layout_width="wrap_content"
+        android:minWidth="40dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:textSize="16sp"
+        android:hint="@string/rate_value_placeholder"
+        android:inputType="numberDecimal"
+        android:imeOptions="actionDone"
+        android:gravity="end"
+        tools:text="1.12345"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="1,1234567" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

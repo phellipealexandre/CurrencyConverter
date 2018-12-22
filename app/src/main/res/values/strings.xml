@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">CurrencyConverter</string>
     <string name="activity_error_msg">An error has occurred. Please try again later.</string>
+    <string name="rate_value_placeholder">0</string>
 </resources>
