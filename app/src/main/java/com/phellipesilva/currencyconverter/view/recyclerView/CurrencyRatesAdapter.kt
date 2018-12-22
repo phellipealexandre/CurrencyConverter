@@ -2,7 +2,6 @@ package com.phellipesilva.currencyconverter.view.recyclerView
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -39,7 +38,7 @@ class CurrencyRatesAdapter(
         holder.txtRateName.text = rate.rateName
         holder.edtRateValue.setText(DecimalFormat(doubleTwoDigitsFormat).format(rate.rateValue))
 
-        holder.itemView.setOnClickListener { moveToRateListFirstIndex(holder, position) }
+        holder.itemView.setOnClickListener { moveClickedRateToFirstPositionIndex(holder, position) }
     }
 
     fun updateData(newRates: List<Rate>) {
@@ -54,11 +53,12 @@ class CurrencyRatesAdapter(
         this.onChangedListener = listener
     }
 
-    private fun moveToRateListFirstIndex(holder: CurrencyRatesViewHolder, position: Int) {
-        val rate = currencyRatesList.removeAt(position)
-        currencyRatesList.addFirst(rate)
-        notifyItemMoved(position, 0)
+    private fun moveClickedRateToFirstPositionIndex(holder: CurrencyRatesViewHolder, position: Int) {
+        val newList = LinkedList(currencyRatesList)
+        val rate = newList.removeAt(position)
+        newList.addFirst(rate)
 
+        this.updateData(newList)
         holder.edtRateValue.requestFocusWithKeyboard()
 
         if (::onChangedListener.isInitialized) {

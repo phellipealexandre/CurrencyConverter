@@ -17,9 +17,9 @@ import javax.inject.Inject
 @Reusable
 class CurrencyConverterViewModel @Inject constructor(private val currencyRepository: CurrencyRepository) : ViewModel() {
 
-    private var currentBaseRate = "EUR"
+    private var currentBaseRate = Rate("EUR", 100.0)
     private var disposable = Disposables.empty()
-    private var rateOrderMask = listOf(currentBaseRate)
+    private var rateOrderMask = listOf(currentBaseRate.rateName)
 
     private val currencyRates by lazy { currencyRepository.getCurrencyRates() }
     private val viewState = MutableLiveData<ViewState>()
@@ -44,19 +44,21 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
     fun currencyRates(): LiveData<List<Rate>> {
         return Transformations.map(currencyRates) { currencyRates ->
             rateOrderMask.map {
-                val currentBaseRateValue = 100.0
-
                 val currentRateValue = if (currencyRates.rates.containsKey(it)) {
-                    currencyRates.rates.getValue(it).times(currentBaseRateValue)
-                } else { currentBaseRateValue }
+                    currencyRates.rates.getValue(it).times(currentBaseRate.rateValue)
+                } else { currentBaseRate.rateValue }
 
                 Rate(it, currentRateValue)
             }
         }
     }
 
-    fun updatesRateOrderMask(mask: List<String>) {
-        this.rateOrderMask = mask
+    fun updatesRateOrderMask(newMask: List<Rate>) {
+        this.rateOrderMask = newMask.map { it.rateName }
+        this.currentBaseRate = newMask.first()
+
+        disposable.dispose()
+        startCurrencyRatesUpdate()
     }
 
     private fun emitsErrorState() {

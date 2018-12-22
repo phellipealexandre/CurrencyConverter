@@ -127,7 +127,12 @@ class CurrencyConverterViewModelTest {
         currencyRateLiveData.value = currencyRatesFromDatabase
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
-        currencyConverterViewModel.updatesRateOrderMask(listOf("base", "Key1"))
+        currencyConverterViewModel.updatesRateOrderMask(
+            listOf(
+                Rate("base", 100.0),
+                Rate("Key1", 1.555)
+            ))
+
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -196,11 +201,19 @@ class CurrencyConverterViewModelTest {
         currencyRateLiveData.value = currencyRatesFromDatabase
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
-        currencyConverterViewModel.updatesRateOrderMask(listOf("Key3", "Key2", "Key1"))
+        currencyConverterViewModel.updatesRateOrderMask(
+            listOf(
+                Rate("base", 100.0),
+                Rate("Key3", 1.8),
+                Rate("Key2", 1.6),
+                Rate("Key1", 1.5)
+            )
+        )
 
         currencyConverterViewModel.currencyRates().observeForever {
-            assertThat(it).hasSize(3)
+            assertThat(it).hasSize(4)
             assertThat(it).containsExactly(
+                Rate("base", 100.0),
                 Rate("Key3", 180.0),
                 Rate("Key2", 160.0),
                 Rate("Key1", 150.0)
@@ -215,11 +228,33 @@ class CurrencyConverterViewModelTest {
         currencyRateLiveData.value = currencyRatesFromDatabase
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
-        currencyConverterViewModel.updatesRateOrderMask(listOf("Key2"))
+        currencyConverterViewModel.updatesRateOrderMask(
+            listOf(
+                Rate("base", 100.0),
+                Rate("Key3", 1.8)
+            )
+        )
 
         currencyConverterViewModel.currencyRates().observeForever {
-            assertThat(it).hasSize(1)
-            assertThat(it).containsExactly(Rate("Key2", 160.0))
+            assertThat(it).hasSize(2)
+            assertThat(it).containsExactly(
+                Rate("base", 100.0),
+                Rate("Key3", 180.0)
+            )
         }
+    }
+
+    @Test
+    fun shouldFetchNewCurrencyRatesWithFirstElementOfMask() {
+        currencyConverterViewModel.updatesRateOrderMask(
+            listOf(
+                Rate("base2", 100.0),
+                Rate("Key3", 1.8)
+            )
+        )
+
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
+        verify(repository, atLeastOnce()).fetchCurrencyRates("base2")
     }
 }

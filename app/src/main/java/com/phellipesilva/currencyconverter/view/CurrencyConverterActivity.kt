@@ -28,7 +28,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
     private fun initializeRecyclerView() {
         val adapter = CurrencyRatesAdapter(this)
         adapter.setOnPositionChangedListener {
-            viewModel.updatesRateOrderMask(it.map { it.rateName })
+            viewModel.updatesRateOrderMask(it)
             recyclerView.scrollToPosition(0)
         }
 
