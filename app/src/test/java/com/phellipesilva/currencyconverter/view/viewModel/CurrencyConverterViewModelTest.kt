@@ -3,8 +3,8 @@ package com.phellipesilva.currencyconverter.view.viewModel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.phellipesilva.currencyconverter.models.CurrencyRates
-import com.phellipesilva.currencyconverter.models.Rate
+import com.phellipesilva.currencyconverter.database.entity.Currency
+import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.repository.CurrencyRepository
 import com.phellipesilva.currencyconverter.utils.RxUtils
 import com.phellipesilva.currencyconverter.view.state.ViewState
@@ -50,7 +50,7 @@ class CurrencyConverterViewModelTest {
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
-        verify(repository).fetchCurrencyRates("EUR")
+        verify(repository).fetchCurrencyRates(Currency("EUR", 100.0))
     }
 
     @Test
@@ -58,25 +58,25 @@ class CurrencyConverterViewModelTest {
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(0, TimeUnit.SECONDS)
 
-        verify(repository, never()).fetchCurrencyRates("EUR")
+        verify(repository, never()).fetchCurrencyRates(Currency("EUR", 100.0))
     }
 
     @Test
     fun shouldCallCurrencyRatesServiceAfterTheFirstSecond() {
-        val currencyRates = CurrencyRates(1, "EUR", "date", mapOf())
+        val currencyRates = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
         val observable = Observable.just(currencyRates)
-        `when`(repository.fetchCurrencyRates("EUR")).thenReturn(observable)
+        `when`(repository.fetchCurrencyRates(Currency("EUR", 100.0))).thenReturn(observable)
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
-        verify(repository, atLeastOnce()).fetchCurrencyRates("EUR")
+        verify(repository, atLeastOnce()).fetchCurrencyRates(Currency("EUR", 100.0))
     }
 
     @Test
     fun shouldEmitErrorStateWhenServiceCallFails() {
         val observable = Observable.error<CurrencyRates>(Exception())
-        `when`(repository.fetchCurrencyRates("EUR")).thenReturn(observable)
+        `when`(repository.fetchCurrencyRates(Currency("EUR", 100.0))).thenReturn(observable)
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -88,21 +88,21 @@ class CurrencyConverterViewModelTest {
 
     @Test
     fun shouldCallCurrencyRatesServiceInEachSecond() {
-        val currencyRates = CurrencyRates(1, "EUR", "date", mapOf())
+        val currencyRates = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
         val observable = Observable.just(currencyRates)
-        `when`(repository.fetchCurrencyRates("EUR")).thenReturn(observable)
+        `when`(repository.fetchCurrencyRates(Currency("EUR", 100.0))).thenReturn(observable)
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS)
 
-        verify(repository, times(10)).fetchCurrencyRates("EUR")
+        verify(repository, times(10)).fetchCurrencyRates(Currency("EUR", 100.0))
     }
 
     @Test
     fun shouldSaveCurrencyRateInDatabaseWhenResponseFromServerIsSuccessful() {
-        val currencyRates = CurrencyRates(1, "base", "date", mapOf())
+        val currencyRates = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
         val observable = Observable.just(currencyRates)
-        `when`(repository.fetchCurrencyRates("EUR")).thenReturn(observable)
+        `when`(repository.fetchCurrencyRates(Currency("EUR", 100.0))).thenReturn(observable)
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -122,15 +122,15 @@ class CurrencyConverterViewModelTest {
 
     @Test
     fun shouldBaseCurrencyValueBe100AndAllOtherCurrenciesBeMultipliedByTheBaseRate() {
-        val currencyRatesFromDatabase = CurrencyRates(1, "base", "date", mapOf("Key1" to 1.555))
+        val currencyRatesFromDatabase = CurrencyRates(1, Currency("EUR", 100.0), mapOf("Key1" to 1.555))
         val currencyRateLiveData = MutableLiveData<CurrencyRates>()
         currencyRateLiveData.value = currencyRatesFromDatabase
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
         currencyConverterViewModel.updatesRateOrderMask(
             listOf(
-                Rate("base", 100.0),
-                Rate("Key1", 1.555)
+                Currency("base", 100.0),
+                Currency("Key1", 1.555)
             ))
 
 
@@ -140,22 +140,22 @@ class CurrencyConverterViewModelTest {
         currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(2)
             assertThat(it).containsExactly(
-                Rate("base", 100.0),
-                Rate("Key1", 155.5)
+                Currency("base", 100.0),
+                Currency("Key1", 155.5)
             )
         }
     }
 
     @Test
     fun shouldMapCurrencyRatesObjectToAListOfRateWithOneElement() {
-        val currencyRatesFromDatabase = CurrencyRates(1, "base", "date", mapOf("Key1" to 1.5))
+        val currencyRatesFromDatabase = CurrencyRates(1, Currency("EUR", 100.0), mapOf("Key1" to 1.5))
         val currencyRateLiveData = MutableLiveData<CurrencyRates>()
         currencyRateLiveData.value = currencyRatesFromDatabase
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
-        val currencyRatesFromServer = CurrencyRates(1, "base", "date", mapOf("Key1" to 1.5))
+        val currencyRatesFromServer = CurrencyRates(1, Currency("EUR", 100.0), mapOf("Key1" to 1.5))
         val observable = Observable.just(currencyRatesFromServer)
-        `when`(repository.fetchCurrencyRates("EUR")).thenReturn(observable)
+        `when`(repository.fetchCurrencyRates(Currency("EUR", 100.0))).thenReturn(observable)
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -163,22 +163,22 @@ class CurrencyConverterViewModelTest {
         currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(2)
             assertThat(it).containsExactly(
-                Rate("base", 100.0),
-                Rate("Key1", 150.0)
+                Currency("EUR", 100.0),
+                Currency("Key1", 150.0)
             )
         }
     }
 
     @Test
     fun shouldMapCurrencyRatesObjectToAListOfRateWithNElements() {
-        val currencyRatesFromDatabase = CurrencyRates(1, "base", "date", mapOf("Key1" to 1.5, "Key2" to 1.6, "Key3" to 1.8))
+        val currencyRatesFromDatabase = CurrencyRates(1, Currency("EUR", 100.0), mapOf("Key1" to 1.5, "Key2" to 1.6, "Key3" to 1.8))
         val currencyRateLiveData = MutableLiveData<CurrencyRates>()
         currencyRateLiveData.value = currencyRatesFromDatabase
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
-        val currencyRatesFromServer = CurrencyRates(1, "base", "date", mapOf("Key1" to 1.5, "Key2" to 1.6, "Key3" to 1.8))
+        val currencyRatesFromServer = CurrencyRates(1, Currency("EUR", 100.0), mapOf("Key1" to 1.5, "Key2" to 1.6, "Key3" to 1.8))
         val observable = Observable.just(currencyRatesFromServer)
-        `when`(repository.fetchCurrencyRates("EUR")).thenReturn(observable)
+        `when`(repository.fetchCurrencyRates(Currency("EUR", 100.0))).thenReturn(observable)
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -186,60 +186,60 @@ class CurrencyConverterViewModelTest {
         currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(4)
             assertThat(it).containsExactly(
-                Rate("base", 100.0),
-                Rate("Key1", 150.0),
-                Rate("Key2", 160.0),
-                Rate("Key3", 180.0)
+                Currency("EUR", 100.0),
+                Currency("Key1", 150.0),
+                Currency("Key2", 160.0),
+                Currency("Key3", 180.0)
             )
         }
     }
 
     @Test
     fun shouldSetRatesWithMaskOrder() {
-        val currencyRatesFromDatabase = CurrencyRates(1, "base", "date", mapOf("Key1" to 1.5, "Key2" to 1.6, "Key3" to 1.8))
+        val currencyRatesFromDatabase = CurrencyRates(1, Currency("EUR", 100.0), mapOf("Key1" to 1.5, "Key2" to 1.6, "Key3" to 1.8))
         val currencyRateLiveData = MutableLiveData<CurrencyRates>()
         currencyRateLiveData.value = currencyRatesFromDatabase
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
         currencyConverterViewModel.updatesRateOrderMask(
             listOf(
-                Rate("base", 100.0),
-                Rate("Key3", 1.8),
-                Rate("Key2", 1.6),
-                Rate("Key1", 1.5)
+                Currency("EUR", 100.0),
+                Currency("Key3", 1.8),
+                Currency("Key2", 1.6),
+                Currency("Key1", 1.5)
             )
         )
 
         currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(4)
             assertThat(it).containsExactly(
-                Rate("base", 100.0),
-                Rate("Key3", 180.0),
-                Rate("Key2", 160.0),
-                Rate("Key1", 150.0)
+                Currency("EUR", 100.0),
+                Currency("Key3", 180.0),
+                Currency("Key2", 160.0),
+                Currency("Key1", 150.0)
             )
         }
     }
 
     @Test
     fun shouldRemoveRatesFromListWhenKeyDoesNotExistOnMask() {
-        val currencyRatesFromDatabase = CurrencyRates(1, "base", "date", mapOf("Key1" to 1.5, "Key2" to 1.6, "Key3" to 1.8))
+        val currencyRatesFromDatabase = CurrencyRates(1, Currency("EUR", 100.0), mapOf("Key1" to 1.5, "Key2" to 1.6, "Key3" to 1.8))
         val currencyRateLiveData = MutableLiveData<CurrencyRates>()
         currencyRateLiveData.value = currencyRatesFromDatabase
         `when`(repository.getCurrencyRates()).thenReturn(currencyRateLiveData)
 
         currencyConverterViewModel.updatesRateOrderMask(
             listOf(
-                Rate("base", 100.0),
-                Rate("Key3", 1.8)
+                Currency("EUR", 100.0),
+                Currency("Key3", 1.8)
             )
         )
 
         currencyConverterViewModel.getObservableListOfRates().observeForever {
             assertThat(it).hasSize(2)
             assertThat(it).containsExactly(
-                Rate("base", 100.0),
-                Rate("Key3", 180.0)
+                Currency("EUR", 100.0),
+                Currency("Key3", 180.0)
             )
         }
     }
@@ -248,13 +248,13 @@ class CurrencyConverterViewModelTest {
     fun shouldFetchNewCurrencyRatesWithFirstElementOfMask() {
         currencyConverterViewModel.updatesRateOrderMask(
             listOf(
-                Rate("base2", 100.0),
-                Rate("Key3", 1.8)
+                Currency("EUR", 100.0),
+                Currency("Key3", 1.8)
             )
         )
 
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
-        verify(repository, atLeastOnce()).fetchCurrencyRates("base2")
+        verify(repository, atLeastOnce()).fetchCurrencyRates(Currency("EUR", 100.0))
     }
 }

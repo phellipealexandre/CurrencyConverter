@@ -2,7 +2,8 @@ package com.phellipesilva.currencyconverter.repository
 
 import androidx.lifecycle.LiveData
 import com.phellipesilva.currencyconverter.database.CurrencyDAO
-import com.phellipesilva.currencyconverter.models.CurrencyRates
+import com.phellipesilva.currencyconverter.database.entity.Currency
+import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.service.CurrencyRatesService
 import io.reactivex.Observable
 import javax.inject.Inject
@@ -17,8 +18,12 @@ class CurrencyRepository @Inject constructor(
         return currencyDAO.getCurrencyRates()
     }
 
-    fun fetchCurrencyRates(baseRate: String): Observable<CurrencyRates> {
-        return currencyRatesService.getRates(baseRate)
+    fun fetchCurrencyRates(currency: Currency): Observable<CurrencyRates> {
+        return currencyRatesService
+            .getRates(currency.currencyName)
+            .map {
+                CurrencyRates(1, currency, it.rates)
+            }
     }
 
     fun updatesDatabase(currencyRates: CurrencyRates) {

@@ -4,8 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.phellipesilva.currencyconverter.database.CurrencyDAO
-import com.phellipesilva.currencyconverter.models.CurrencyRates
+import com.phellipesilva.currencyconverter.database.entity.Currency
+import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.service.CurrencyRatesService
+import com.phellipesilva.currencyconverter.service.RemoteCurrencyRates
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -39,7 +41,7 @@ class CurrencyRepositoryTest {
 
     @Test
     fun shouldReturnSameLiveDateAsDAOWhenRequestCurrencyRates() {
-        val currencyRates = CurrencyRates(1, "base", "date", mapOf())
+        val currencyRates = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
         val expectedLiveData = MutableLiveData<CurrencyRates>()
         expectedLiveData.value = currencyRates
 
@@ -51,11 +53,12 @@ class CurrencyRepositoryTest {
 
     @Test
     fun shouldReturnObservableWhenRequestedCurrencyRatesFromServer() {
-        val expectedCurrencyRates = CurrencyRates(1, "base", "date", mapOf())
-        val observable = Observable.just(expectedCurrencyRates)
+        val remoteCurrencyRates = RemoteCurrencyRates("base", "date", mapOf())
+        val expectedCurrencyRates = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
+        val observable = Observable.just(remoteCurrencyRates)
         `when`(currencyRatesService.getRates("EUR")).thenReturn(observable)
 
-        val currencyRatesObservable = currencyRepository.fetchCurrencyRates("EUR")
+        val currencyRatesObservable = currencyRepository.fetchCurrencyRates(Currency("EUR", 100.0))
         val testObserver = TestObserver<CurrencyRates>()
         currencyRatesObservable.subscribe(testObserver)
 
@@ -65,7 +68,7 @@ class CurrencyRepositoryTest {
 
     @Test
     fun shouldPassParameterToDAOWhenSaveIsRequested() {
-        val expectedCurrencyRates = CurrencyRates(1, "base", "date", mapOf())
+        val expectedCurrencyRates = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
 
         currencyRepository.updatesDatabase(expectedCurrencyRates)
 

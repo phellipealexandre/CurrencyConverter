@@ -1,26 +1,26 @@
 package com.phellipesilva.currencyconverter.view.recyclerView
 
 import androidx.recyclerview.widget.DiffUtil
-import com.phellipesilva.currencyconverter.models.Rate
+import com.phellipesilva.currencyconverter.database.entity.Currency
 
 class CurrencyRateDiffCallback(
-    private val oldRates: List<Rate>,
-    private val newRates: List<Rate>
+    private val oldCurrencies: List<Currency>,
+    private val newCurrencies: List<Currency>
 ) : DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldRates[oldItemPosition].rateName == newRates[newItemPosition].rateName
+        return oldCurrencies[oldItemPosition].currencyName == newCurrencies[newItemPosition].currencyName
     }
 
     override fun getOldListSize(): Int {
-        return oldRates.size
+        return oldCurrencies.size
     }
 
     override fun getNewListSize(): Int {
-        return newRates.size
+        return newCurrencies.size
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldRates[oldItemPosition] == newRates[newItemPosition]
+        return oldCurrencies[oldItemPosition] == newCurrencies[newItemPosition]
     }
 }

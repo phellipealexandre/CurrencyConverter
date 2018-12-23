@@ -5,7 +5,9 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.phellipesilva.currencyconverter.models.CurrencyRates
+import com.phellipesilva.currencyconverter.database.entity.Currency
+import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
+import com.phellipesilva.currencyconverter.service.RemoteCurrencyRates
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +39,7 @@ class CurrencyDAORoomTest {
 
     @Test
     fun shouldReceiveTheSameValueStoredWhenDatabaseWasPreviouslyEmpty() {
-        val expectedCurrencyRate = CurrencyRates(1, "base", "date", mapOf())
+        val expectedCurrencyRate = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
         currencyDAO.save(expectedCurrencyRate)
 
         currencyDAO.getCurrencyRates().observeForever {
@@ -47,8 +49,8 @@ class CurrencyDAORoomTest {
 
     @Test
     fun shouldReplaceStoreCurrencyRateWhenSavedObjetsHaveTheSameID() {
-        val currencyRate = CurrencyRates(1, "base", "date", mapOf())
-        val expectedCurrencyRate = CurrencyRates(1, "newbase", "newdate", mapOf("Key" to 1.1))
+        val currencyRate = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
+        val expectedCurrencyRate = CurrencyRates(1, Currency("BRL", 150.0), mapOf("Key" to 1.1))
 
         currencyDAO.save(currencyRate)
         currencyDAO.save(expectedCurrencyRate)

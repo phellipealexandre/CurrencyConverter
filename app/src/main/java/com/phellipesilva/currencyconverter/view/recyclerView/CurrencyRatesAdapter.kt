@@ -8,7 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.phellipesilva.currencyconverter.R
-import com.phellipesilva.currencyconverter.models.Rate
+import com.phellipesilva.currencyconverter.database.entity.Currency
 import kotlinx.android.synthetic.main.currency_rate_list_item.view.*
 import java.util.*
 import androidx.recyclerview.widget.DiffUtil
@@ -20,8 +20,8 @@ class CurrencyRatesAdapter(
 ) : RecyclerView.Adapter<CurrencyRatesAdapter.CurrencyRatesViewHolder>() {
 
     private val doubleTwoDigitsFormat = "0.00"
-    private var currencyRatesList = LinkedList<Rate>()
-    private lateinit var onChangedListener: (List<Rate>) -> Unit
+    private var currencyRatesList = LinkedList<Currency>()
+    private lateinit var onChangedListener: (List<Currency>) -> Unit
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyRatesViewHolder {
         return CurrencyRatesViewHolder(
@@ -35,21 +35,21 @@ class CurrencyRatesAdapter(
 
     override fun onBindViewHolder(holder: CurrencyRatesViewHolder, position: Int) {
         val rate = currencyRatesList[position]
-        holder.txtRateName.text = rate.rateName
-        holder.edtRateValue.setText(DecimalFormat(doubleTwoDigitsFormat).format(rate.rateValue))
+        holder.txtRateName.text = rate.currencyName
+        holder.edtRateValue.setText(DecimalFormat(doubleTwoDigitsFormat).format(rate.currencyValue))
 
         holder.itemView.setOnClickListener { moveClickedRateToFirstPositionIndex(holder, position) }
     }
 
-    fun updateData(newRates: List<Rate>) {
-        val diffCallback = CurrencyRateDiffCallback(this.currencyRatesList, newRates)
+    fun updateData(newCurrencies: List<Currency>) {
+        val diffCallback = CurrencyRateDiffCallback(this.currencyRatesList, newCurrencies)
         val diffResult = DiffUtil.calculateDiff(diffCallback, true)
         diffResult.dispatchUpdatesTo(this)
 
-        this.currencyRatesList = LinkedList(newRates)
+        this.currencyRatesList = LinkedList(newCurrencies)
     }
 
-    fun setOnPositionChangedListener(listener: (List<Rate>) -> Unit) {
+    fun setOnPositionChangedListener(listener: (List<Currency>) -> Unit) {
         this.onChangedListener = listener
     }
 

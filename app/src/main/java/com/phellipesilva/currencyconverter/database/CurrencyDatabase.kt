@@ -3,7 +3,7 @@ package com.phellipesilva.currencyconverter.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.phellipesilva.currencyconverter.models.CurrencyRates
+import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 
 @Database(entities = [CurrencyRates::class], version = 1)
 @TypeConverters(MapTypeConverter::class)

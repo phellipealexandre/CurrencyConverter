@@ -1,7 +1,6 @@
 package com.phellipesilva.currencyconverter.service
 
 import com.google.common.truth.Truth.assertThat
-import com.phellipesilva.currencyconverter.models.CurrencyRates
 import io.reactivex.observers.TestObserver
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -40,7 +39,7 @@ class CurrencyRatesServiceTest {
 
     @Test
     fun shouldReceiveAndParseResponseWhenServiceCallIsMade() {
-        val testObserver = TestObserver<CurrencyRates>()
+        val testObserver = TestObserver<RemoteCurrencyRates>()
         val json = readJsonFromResources("json-responses/simple_response.json")
         val mockResponse = MockResponse().setBody(json)
         server.enqueue(mockResponse)
@@ -56,7 +55,7 @@ class CurrencyRatesServiceTest {
 
     @Test
     fun shouldBuildCorrectQueryParameterWithBaseRateParameter() {
-        val testObserver = TestObserver<CurrencyRates>()
+        val testObserver = TestObserver<RemoteCurrencyRates>()
         val json = readJsonFromResources("json-responses/simple_response.json")
         val mockResponse = MockResponse().setBody(json)
         server.enqueue(mockResponse)

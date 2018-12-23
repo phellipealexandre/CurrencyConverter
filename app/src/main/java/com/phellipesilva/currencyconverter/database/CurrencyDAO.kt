@@ -5,7 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
-import com.phellipesilva.currencyconverter.models.CurrencyRates
+import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 
 @Dao
 interface CurrencyDAO {
