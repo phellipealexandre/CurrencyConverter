@@ -7,7 +7,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.phellipesilva.currencyconverter.database.entity.Currency
 import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
-import com.phellipesilva.currencyconverter.service.RemoteCurrencyRates
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +39,7 @@ class CurrencyDAORoomTest {
     @Test
     fun shouldReceiveTheSameValueStoredWhenDatabaseWasPreviouslyEmpty() {
         val expectedCurrencyRate = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
-        currencyDAO.save(expectedCurrencyRate)
+        currencyDAO.saveCurrencyRates(expectedCurrencyRate)
 
         currencyDAO.getCurrencyRates().observeForever {
             assertThat(it).isEqualTo(expectedCurrencyRate)
@@ -52,11 +51,33 @@ class CurrencyDAORoomTest {
         val currencyRate = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
         val expectedCurrencyRate = CurrencyRates(1, Currency("BRL", 150.0), mapOf("Key" to 1.1))
 
-        currencyDAO.save(currencyRate)
-        currencyDAO.save(expectedCurrencyRate)
+        currencyDAO.saveCurrencyRates(currencyRate)
+        currencyDAO.saveCurrencyRates(expectedCurrencyRate)
 
         currencyDAO.getCurrencyRates().observeForever {
             assertThat(it).isEqualTo(expectedCurrencyRate)
+        }
+    }
+
+    @Test
+    fun shouldUpdateCurrencyBaseRateValueWhenObjectIsStored() {
+        val currencyRate = CurrencyRates(1, Currency("EUR", 100.0), mapOf("Key" to 1.1))
+
+        currencyDAO.saveCurrencyRates(currencyRate)
+        currencyDAO.updateBaseCurrencyValue(200.0)
+
+        currencyDAO.getCurrencyRates().observeForever {
+            assertThat(it.base).isEqualTo(Currency("EUR", 200.0))
+            assertThat(it.rates).isEqualTo(mapOf("Key" to 1.1))
+        }
+    }
+
+    @Test
+    fun shouldDoNothingWhenTryingToUpdateBaseRateValueOnEmptyDatabase() {
+        currencyDAO.updateBaseCurrencyValue(200.0)
+
+        currencyDAO.getCurrencyRates().observeForever {
+            assertThat(it).isNull()
         }
     }
 }

@@ -67,7 +67,7 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
     }
 
     fun updateBaseCurrencyValue(currency: Currency) {
-        currencyRepository.updatesBaseRateValue(currency)
+        currencyRepository.updatesBaseCurrencyValue(currency)
         this.currentBaseCurrency = currency
     }
 

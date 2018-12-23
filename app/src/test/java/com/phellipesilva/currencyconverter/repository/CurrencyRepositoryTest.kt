@@ -81,6 +81,15 @@ class CurrencyRepositoryTest {
 
         currencyRepository.updatesDatabase(expectedCurrencyRates)
 
-        verify(currencyDAO).save(expectedCurrencyRates)
+        verify(currencyDAO).saveCurrencyRates(expectedCurrencyRates)
+    }
+
+    @Test
+    fun shouldPassCurrencyValueToDAOWhenUpdatingBaseCurrencyValueIsRequested() {
+        val currency = Currency("EUR", 123.9)
+
+        currencyRepository.updatesBaseCurrencyValue(currency)
+
+        verify(currencyDAO).updateBaseCurrencyValue(123.9)
     }
 }

@@ -26,13 +26,13 @@ class CurrencyRepository @Inject constructor(
     }
 
     fun updatesDatabase(currencyRates: CurrencyRates) {
-        Completable.create { currencyDAO.save(currencyRates) }
+        Completable.create { currencyDAO.saveCurrencyRates(currencyRates) }
             .subscribeOn(Schedulers.io())
             .subscribe()
     }
 
-    fun updatesBaseRateValue(newBaseRate: Currency) {
-        Completable.create { currencyDAO.updateBaseRateValue(newBaseRate.currencyValue) }
+    fun updatesBaseCurrencyValue(newBaseRate: Currency) {
+        Completable.create { currencyDAO.updateBaseCurrencyValue(newBaseRate.currencyValue) }
             .subscribeOn(Schedulers.io())
             .subscribe()
     }

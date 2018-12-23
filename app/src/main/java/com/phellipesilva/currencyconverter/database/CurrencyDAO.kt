@@ -11,11 +11,11 @@ import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 interface CurrencyDAO {
 
     @Insert(onConflict = REPLACE)
-    fun save(currencyRates: CurrencyRates)
+    fun saveCurrencyRates(currencyRates: CurrencyRates)
 
     @Query("SELECT * FROM currencyRates")
     fun getCurrencyRates(): LiveData<CurrencyRates>
 
     @Query("UPDATE currencyRates SET baseCurrencyValue = :currencyValue")
-    fun updateBaseRateValue(currencyValue: Double)
+    fun updateBaseCurrencyValue(currencyValue: Double)
 }
