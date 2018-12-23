@@ -1,4 +1,4 @@
-package com.phellipesilva.currencyconverter.database
+package com.phellipesilva.currencyconverter.database.room
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

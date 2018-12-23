@@ -24,8 +24,13 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
     private val currencyRates by lazy { currencyRepository.getCurrencyRates() }
     private val viewState = MutableLiveData<ViewState>()
 
+    init {
+        currentBaseCurrency = currencyRepository.getBaseCurrencyFromPreferences()
+    }
+
     override fun onCleared() {
         super.onCleared()
+        currencyRepository.saveBaseCurrencyOnSharedPrefs(currentBaseCurrency)
         disposable.dispose()
     }
 
@@ -37,12 +42,12 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
             .switchMap { currencyRepository.fetchCurrencyRates(currentBaseCurrency) }
             .doOnNext(::initMaskAndBaseRate)
             .subscribe(
-                { currencyRepository.updatesDatabase(it) },
+                { currencyRepository.updatesCurrencyRates(it) },
                 { emitsErrorState() }
             )
     }
 
-    fun getObservableListOfRates(): LiveData<List<Currency>> {
+    fun getObservableListOfCurrencies(): LiveData<List<Currency>> {
         return Transformations.map(currencyRates) { currencyRates ->
             currencyRates?.let {
                 initMaskAndBaseRate(it)
@@ -55,12 +60,7 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
         this.rateOrderMask = newMask.map { it.currencyName }
         this.currentBaseCurrency = newMask.first()
 
-        val map = newMask.asSequence().filterIndexed { index, _ -> index != 0 }
-            .map { it.currencyName to it.currencyValue.div(currentBaseCurrency.currencyValue) }
-            .toMap()
-
-        val newCurrencyRates = CurrencyRates(1, currentBaseCurrency, map)
-        currencyRepository.updatesDatabase(newCurrencyRates)
+        recalculateRatesWhenChangesBaseCurrency(newMask)
 
         disposable.dispose()
         startCurrencyRatesUpdate()
@@ -69,6 +69,23 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
     fun updateBaseCurrencyValue(currency: Currency) {
         currencyRepository.updatesBaseCurrencyValue(currency)
         this.currentBaseCurrency = currency
+
+        if (currency.currencyValue == 0.0) {
+            disposable.dispose()
+        } else if (disposable.isDisposed && currency.currencyValue > 0.0) {
+            startCurrencyRatesUpdate()
+        }
+    }
+
+    private fun recalculateRatesWhenChangesBaseCurrency(newMask: List<Currency>) {
+        if (currentBaseCurrency.currencyValue > 0.0) {
+            val currencyRatesMap = newMask.asSequence().filterIndexed { index, _ -> index != 0 }
+                .map { it.currencyName to it.currencyValue.div(currentBaseCurrency.currencyValue) }
+                .toMap()
+
+            val newCurrencyRates = CurrencyRates(1, currentBaseCurrency, currencyRatesMap)
+            currencyRepository.updatesCurrencyRates(newCurrencyRates)
+        }
     }
 
     private fun transformCurrencyRatesToListApplyingMask(currencyRates: CurrencyRates): List<Currency>? {

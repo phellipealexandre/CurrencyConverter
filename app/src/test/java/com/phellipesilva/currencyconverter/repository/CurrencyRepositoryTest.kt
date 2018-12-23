@@ -3,9 +3,10 @@ package com.phellipesilva.currencyconverter.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.phellipesilva.currencyconverter.database.CurrencyDAO
 import com.phellipesilva.currencyconverter.database.entity.Currency
 import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
+import com.phellipesilva.currencyconverter.database.room.CurrencyDAO
+import com.phellipesilva.currencyconverter.database.sharedprefs.CurrencyPreferences
 import com.phellipesilva.currencyconverter.service.CurrencyRatesService
 import com.phellipesilva.currencyconverter.service.RemoteCurrencyRates
 import com.phellipesilva.currencyconverter.utils.RxUtils
@@ -37,9 +38,12 @@ class CurrencyRepositoryTest {
     @Mock
     private lateinit var currencyDAO: CurrencyDAO
 
+    @Mock
+    private lateinit var currencyPreferences: CurrencyPreferences
+
     @Before
     fun setUp() {
-        currencyRepository = CurrencyRepository(currencyRatesService, currencyDAO)
+        currencyRepository = CurrencyRepository(currencyRatesService, currencyDAO, currencyPreferences)
         RxUtils.overridesEnvironmentToCustomScheduler(Schedulers.trampoline())
     }
 
@@ -79,7 +83,7 @@ class CurrencyRepositoryTest {
     fun shouldPassParameterToDAOWhenSaveIsRequested() {
         val expectedCurrencyRates = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
 
-        currencyRepository.updatesDatabase(expectedCurrencyRates)
+        currencyRepository.updatesCurrencyRates(expectedCurrencyRates)
 
         verify(currencyDAO).saveCurrencyRates(expectedCurrencyRates)
     }
@@ -91,5 +95,21 @@ class CurrencyRepositoryTest {
         currencyRepository.updatesBaseCurrencyValue(currency)
 
         verify(currencyDAO).updateBaseCurrencyValue(123.9)
+    }
+
+    @Test
+    fun shouldCallPreferencesWhenSaveCurrencyInRepository() {
+        val currency = Currency("EUR", 123.9)
+
+        currencyRepository.saveBaseCurrencyOnSharedPrefs(currency)
+
+        verify(currencyPreferences).saveBaseCurrencyOnSharedPrefs(currency)
+    }
+
+    @Test
+    fun shouldGetCurrencyFromPreferencesWhenRequestedFromRepository() {
+        currencyRepository.getBaseCurrencyFromPreferences()
+
+        verify(currencyPreferences).getBaseCurrencyFromPreferences()
     }
 }

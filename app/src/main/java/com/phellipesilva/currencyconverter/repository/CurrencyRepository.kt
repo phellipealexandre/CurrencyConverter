@@ -1,9 +1,10 @@
 package com.phellipesilva.currencyconverter.repository
 
 import androidx.lifecycle.LiveData
-import com.phellipesilva.currencyconverter.database.CurrencyDAO
 import com.phellipesilva.currencyconverter.database.entity.Currency
 import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
+import com.phellipesilva.currencyconverter.database.room.CurrencyDAO
+import com.phellipesilva.currencyconverter.database.sharedprefs.CurrencyPreferences
 import com.phellipesilva.currencyconverter.service.CurrencyRatesService
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -12,20 +13,21 @@ import javax.inject.Inject
 
 class CurrencyRepository @Inject constructor(
     private val currencyRatesService: CurrencyRatesService,
-    private val currencyDAO: CurrencyDAO
+    private val currencyDAO: CurrencyDAO,
+    private val currencyPreferences: CurrencyPreferences
 ) {
 
     fun getCurrencyRates(): LiveData<CurrencyRates> {
         return currencyDAO.getCurrencyRates()
     }
 
-    fun fetchCurrencyRates(currency: Currency): Observable<CurrencyRates> {
+    fun fetchCurrencyRates(baseCurrency: Currency): Observable<CurrencyRates> {
         return currencyRatesService
-            .getRates(currency.currencyName)
-            .map { CurrencyRates(1, currency, it.rates) }
+            .getRates(baseCurrency.currencyName)
+            .map { CurrencyRates(1, baseCurrency, it.rates) }
     }
 
-    fun updatesDatabase(currencyRates: CurrencyRates) {
+    fun updatesCurrencyRates(currencyRates: CurrencyRates) {
         Completable.create { currencyDAO.saveCurrencyRates(currencyRates) }
             .subscribeOn(Schedulers.io())
             .subscribe()
@@ -35,5 +37,13 @@ class CurrencyRepository @Inject constructor(
         Completable.create { currencyDAO.updateBaseCurrencyValue(newBaseRate.currencyValue) }
             .subscribeOn(Schedulers.io())
             .subscribe()
+    }
+
+    fun getBaseCurrencyFromPreferences(): Currency {
+        return currencyPreferences.getBaseCurrencyFromPreferences()
+    }
+
+    fun saveBaseCurrencyOnSharedPrefs(currency: Currency) {
+        currencyPreferences.saveBaseCurrencyOnSharedPrefs(currency)
     }
 }

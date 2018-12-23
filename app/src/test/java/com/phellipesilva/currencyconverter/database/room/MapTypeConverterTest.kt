@@ -1,4 +1,4 @@
-package com.phellipesilva.currencyconverter.database
+package com.phellipesilva.currencyconverter.database.room
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before

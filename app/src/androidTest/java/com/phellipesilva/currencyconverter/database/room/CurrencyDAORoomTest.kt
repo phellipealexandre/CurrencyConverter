@@ -1,4 +1,4 @@
-package com.phellipesilva.currencyconverter.database
+package com.phellipesilva.currencyconverter.database.room
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room

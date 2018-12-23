@@ -47,7 +47,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        viewModel.getObservableListOfRates().observe(this, Observer {
+        viewModel.getObservableListOfCurrencies().observe(this, Observer {
             it?.let { adapter.updateData(it) }
         })
     }
