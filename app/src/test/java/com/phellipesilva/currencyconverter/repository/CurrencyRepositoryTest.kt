@@ -8,8 +8,11 @@ import com.phellipesilva.currencyconverter.database.entity.Currency
 import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.service.CurrencyRatesService
 import com.phellipesilva.currencyconverter.service.RemoteCurrencyRates
+import com.phellipesilva.currencyconverter.utils.RxUtils
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
+import io.reactivex.schedulers.Schedulers
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,6 +40,12 @@ class CurrencyRepositoryTest {
     @Before
     fun setUp() {
         currencyRepository = CurrencyRepository(currencyRatesService, currencyDAO)
+        RxUtils.overridesEnvironmentToCustomScheduler(Schedulers.trampoline())
+    }
+
+    @After
+    fun tearDown() {
+        RxUtils.resetSchedulers()
     }
 
     @Test

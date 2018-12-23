@@ -5,8 +5,9 @@ import com.phellipesilva.currencyconverter.database.CurrencyDAO
 import com.phellipesilva.currencyconverter.database.entity.Currency
 import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.service.CurrencyRatesService
+import io.reactivex.Completable
 import io.reactivex.Observable
-import java.util.concurrent.Executors
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class CurrencyRepository @Inject constructor(
@@ -25,14 +26,14 @@ class CurrencyRepository @Inject constructor(
     }
 
     fun updatesDatabase(currencyRates: CurrencyRates) {
-        Executors.newSingleThreadExecutor().execute {
-            currencyDAO.save(currencyRates)
-        }
+        Completable.create { currencyDAO.save(currencyRates) }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 
     fun updatesBaseRateValue(newBaseRate: Currency) {
-        Executors.newSingleThreadExecutor().execute {
-            currencyDAO.updateBaseRateValue(newBaseRate.currencyValue)
-        }
+        Completable.create { currencyDAO.updateBaseRateValue(newBaseRate.currencyValue) }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 }
