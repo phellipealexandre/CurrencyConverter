@@ -3,6 +3,7 @@ package com.phellipesilva.currencyconverter.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.whenever
 import com.phellipesilva.currencyconverter.database.entity.Currency
 import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.database.room.CurrencyDAO
@@ -19,7 +20,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -58,7 +58,7 @@ class CurrencyRepositoryTest {
         val expectedLiveData = MutableLiveData<CurrencyRates>()
         expectedLiveData.value = currencyRates
 
-        `when`(currencyDAO.getCurrencyRates()).thenReturn(expectedLiveData)
+        whenever(currencyDAO.getCurrencyRates()).thenReturn(expectedLiveData)
         val userLiveData = currencyRepository.getCurrencyRates()
 
         assertThat(userLiveData).isEqualTo(expectedLiveData)
@@ -69,7 +69,7 @@ class CurrencyRepositoryTest {
         val remoteCurrencyRates = RemoteCurrencyRates("base", "date", mapOf())
         val expectedCurrencyRates = CurrencyRates(1, Currency("EUR", 100.0), mapOf())
         val observable = Observable.just(remoteCurrencyRates)
-        `when`(currencyRatesService.getRates("EUR")).thenReturn(observable)
+        whenever(currencyRatesService.getRates("EUR")).thenReturn(observable)
 
         val currencyRatesObservable = currencyRepository.fetchCurrencyRates(Currency("EUR", 100.0))
         val testObserver = TestObserver<CurrencyRates>()
