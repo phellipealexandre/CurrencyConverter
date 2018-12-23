@@ -12,7 +12,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.phellipesilva.currencyconverter.TestInstrumentationRunner"
     }
 
     buildTypes {
@@ -53,14 +53,15 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.4'
 
     //Dagger
-    kapt 'com.google.dagger:dagger-compiler:2.17'
-    implementation 'com.google.dagger:dagger:2.17'
+    kapt 'com.google.dagger:dagger-compiler:2.19'
+    implementation 'com.google.dagger:dagger:2.19'
 
     //Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 
+    //Non-instrumented tests
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.google.truth:truth:0.42'
     testImplementation 'android.arch.core:core-testing:1.1.1'
@@ -68,6 +69,7 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.11.0'
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0"
 
+    //Instrumented tests
     androidTestImplementation 'androidx.test:core:1.1.0'
     androidTestImplementation 'android.arch.core:core-testing:1.1.1'
     androidTestImplementation 'com.google.truth:truth:0.42'
@@ -75,4 +77,6 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.11.0'
+    kaptAndroidTest 'com.google.dagger:dagger-compiler:2.19'
 }
