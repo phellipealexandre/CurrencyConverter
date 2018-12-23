@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.phellipesilva.currencyconverter.R
@@ -43,7 +42,6 @@ class CurrencyConverterActivity : AppCompatActivity() {
             viewModel.updateBaseCurrencyValue(it)
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
