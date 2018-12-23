@@ -10,6 +10,7 @@ import com.phellipesilva.currencyconverter.repository.CurrencyRepository
 import com.phellipesilva.currencyconverter.utils.RxUtils
 import com.phellipesilva.currencyconverter.view.state.ViewState
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.TestScheduler
 import org.junit.After
 import org.junit.Before
@@ -30,6 +31,9 @@ class CurrencyConverterViewModelTest {
     @Mock
     private lateinit var repository: CurrencyRepository
 
+    @Mock
+    private lateinit var disposable: Disposable
+
     private lateinit var currencyConverterViewModel: CurrencyConverterViewModel
     private lateinit var testScheduler: TestScheduler
 
@@ -37,7 +41,7 @@ class CurrencyConverterViewModelTest {
     fun setUp() {
         whenever(repository.getBaseCurrencyFromPreferences()).thenReturn(Currency("EUR", 100.0))
 
-        currencyConverterViewModel = CurrencyConverterViewModel(repository)
+        currencyConverterViewModel = CurrencyConverterViewModel(repository, disposable)
         testScheduler = TestScheduler()
         RxUtils.overridesEnvironmentToCustomScheduler(testScheduler)
     }
@@ -58,7 +62,7 @@ class CurrencyConverterViewModelTest {
     @Test
     fun shouldInitializeViewModelWithRateStoredInPreferences() {
         whenever(repository.getBaseCurrencyFromPreferences()).thenReturn(Currency("BRL", 150.0))
-        currencyConverterViewModel = CurrencyConverterViewModel(repository)
+        currencyConverterViewModel = CurrencyConverterViewModel(repository, disposable)
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -298,12 +302,53 @@ class CurrencyConverterViewModelTest {
     }
 
     @Test
+    fun shouldCancelRatesUpdateAndStartAgainWhenSettingANewMask() {
+        currencyConverterViewModel.updatesRateOrderMask(listOf(Currency("BASE", 100.0)))
+
+        verify(disposable).dispose()
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
+        verify(repository).fetchCurrencyRates(Currency("BASE", 100.0))
+    }
+
+    @Test
     fun shouldCallRepositoryWithNewBaseValueWhenUpdatingFromViewModel() {
         val currency = Currency("BASE", 11.0)
 
         currencyConverterViewModel.updateBaseCurrencyValue(currency)
 
         verify(repository).updatesBaseCurrencyValue(currency)
+    }
+
+    @Test
+    fun shouldCancelRatesUpdateFromServerWhenUpdatingBaseCurrencyValueWithZero() {
+        val currency = Currency("BASE", 0.0)
+
+        currencyConverterViewModel.updateBaseCurrencyValue(currency)
+
+        verify(disposable).dispose()
+    }
+
+    @Test
+    fun shouldStartRatesUpdateFromServerWhenUpdatingBaseCurrencyValueIsGreaterThanZeroAndDisposableWasPreviouslyDisposed() {
+        val currency = Currency("BASE", 100.0)
+        whenever(disposable.isDisposed).thenReturn(true)
+
+        currencyConverterViewModel.updateBaseCurrencyValue(currency)
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
+        verify(repository).fetchCurrencyRates(Currency("BASE", 100.0))
+    }
+
+    @Test
+    fun shouldNotStartRatesUpdateFromServerWhenObservableDisposableIsNotDisposed() {
+        val currency = Currency("BASE", 100.0)
+        whenever(disposable.isDisposed).thenReturn(false)
+
+        currencyConverterViewModel.updateBaseCurrencyValue(currency)
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
+        verify(repository, never()).fetchCurrencyRates(any())
     }
 
     private fun mockCurrencyRatesResponseFromServer(

@@ -9,14 +9,16 @@ import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.repository.CurrencyRepository
 import com.phellipesilva.currencyconverter.view.state.ViewState
 import io.reactivex.Observable
-import io.reactivex.disposables.Disposables
+import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
 
-class CurrencyConverterViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
+class CurrencyConverterViewModel(
+    private val currencyRepository: CurrencyRepository,
+    private var disposable: Disposable
+) : ViewModel() {
 
     private var rateOrderMask: List<String>? = null
     private var currentBaseCurrency = Currency("EUR", 100.0)
-    private var disposable = Disposables.empty()
 
     private val currencyRates by lazy { currencyRepository.getCurrencyRates() }
     private val viewState = MutableLiveData<ViewState>()
