@@ -11,10 +11,11 @@ import dagger.Provides
 import dagger.Reusable
 
 @Module
-class DatabaseModule {
+object DatabaseModule {
 
     @Provides
     @Reusable
+    @JvmStatic
     fun providesCurrencyRateDAO(context: Context): CurrencyDAO =
         Room.databaseBuilder(context, CurrencyDatabase::class.java, "Currency Database")
             .build()
@@ -22,5 +23,6 @@ class DatabaseModule {
 
     @Provides
     @Reusable
+    @JvmStatic
     fun providesSharedPrefs(context: Context): SharedPreferences = context.getSharedPreferences("SharedPrefs", Context.MODE_PRIVATE)
 }

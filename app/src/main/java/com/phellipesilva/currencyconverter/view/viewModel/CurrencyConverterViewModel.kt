@@ -8,14 +8,11 @@ import com.phellipesilva.currencyconverter.database.entity.Currency
 import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.repository.CurrencyRepository
 import com.phellipesilva.currencyconverter.view.state.ViewState
-import dagger.Reusable
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-@Reusable
-class CurrencyConverterViewModel @Inject constructor(private val currencyRepository: CurrencyRepository) : ViewModel() {
+class CurrencyConverterViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
 
     private var rateOrderMask: List<String>? = null
     private var currentBaseCurrency = Currency("EUR", 100.0)

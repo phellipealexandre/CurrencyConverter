@@ -10,10 +10,11 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
-class ServiceModule {
+object ServiceModule {
 
     @Provides
     @Reusable
+    @JvmStatic
     fun providesCurrencyRatesService(): CurrencyRatesService = Retrofit.Builder()
         .baseUrl("https://revolut.duckdns.org/")
         .addConverterFactory(GsonConverterFactory.create())
