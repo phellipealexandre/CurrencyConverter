@@ -39,6 +39,10 @@ class CurrencyConverterActivity : AppCompatActivity() {
             recyclerView.scrollToPosition(0)
         }
 
+        adapter.setOnBaseValueChangedListener {
+            viewModel.updateBaseCurrencyValue(it)
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false

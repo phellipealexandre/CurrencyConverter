@@ -36,9 +36,10 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
             .interval(1, TimeUnit.SECONDS)
             .switchMap { currencyRepository.fetchCurrencyRates(currentBaseCurrency) }
             .doOnNext(::initMaskAndBaseRate)
-            .subscribe(currencyRepository::updatesDatabase) {
-                emitsErrorState()
-            }
+            .subscribe(
+                { currencyRepository.updatesDatabase(it) },
+                { emitsErrorState() }
+            )
     }
 
     fun getObservableListOfRates(): LiveData<List<Currency>> {
@@ -54,8 +55,20 @@ class CurrencyConverterViewModel @Inject constructor(private val currencyReposit
         this.rateOrderMask = newMask.map { it.currencyName }
         this.currentBaseCurrency = newMask.first()
 
+        val map = newMask.asSequence().filterIndexed { index, _ -> index != 0 }
+            .map { it.currencyName to it.currencyValue.div(currentBaseCurrency.currencyValue) }
+            .toMap()
+
+        val newCurrencyRates = CurrencyRates(1, currentBaseCurrency, map)
+        currencyRepository.updatesDatabase(newCurrencyRates)
+
         disposable.dispose()
         startCurrencyRatesUpdate()
+    }
+
+    fun updateBaseCurrencyValue(currency: Currency) {
+        currencyRepository.updatesBaseRateValue(currency)
+        this.currentBaseCurrency = currency
     }
 
     private fun transformCurrencyRatesToListApplyingMask(currencyRates: CurrencyRates): List<Currency>? {

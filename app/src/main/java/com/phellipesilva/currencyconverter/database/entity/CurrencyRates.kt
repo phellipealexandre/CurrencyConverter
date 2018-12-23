@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
 @Entity
 data class CurrencyRates(
     @PrimaryKey val id: Int = 1,
-    @Embedded val base: Currency,
+    @Embedded(prefix = "base") val base: Currency,
     val rates: Map<String, Double>
 )

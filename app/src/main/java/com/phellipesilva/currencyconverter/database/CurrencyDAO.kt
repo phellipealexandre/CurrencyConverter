@@ -15,4 +15,7 @@ interface CurrencyDAO {
 
     @Query("SELECT * FROM currencyRates")
     fun getCurrencyRates(): LiveData<CurrencyRates>
+
+    @Query("UPDATE currencyRates SET baseCurrencyValue = :currencyValue")
+    fun updateBaseRateValue(currencyValue: Double)
 }
