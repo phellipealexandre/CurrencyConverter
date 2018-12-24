@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.phellipesilva.currencyconverter.R
 import com.phellipesilva.currencyconverter.database.entity.Currency
+import com.phellipesilva.currencyconverter.view.extensions.moveCursorToEnd
 import com.phellipesilva.currencyconverter.view.extensions.onContentChange
 import com.phellipesilva.currencyconverter.view.extensions.requestFocusWithKeyboard
 import kotlinx.android.synthetic.main.currency_rate_list_item.view.*
@@ -84,21 +85,30 @@ class CurrencyRatesAdapter(
         val txtRateName: TextView = view.txtRateName
         val edtRateValue: EditText = view.edtRateValue
 
-        fun bind(rate: Currency, onClickListener: (Int) -> Unit, onContentChangedListener: (Int, String) -> Unit) {
+        fun bind(rate: Currency, onEditTextFocus: (Int) -> Unit, onContentChangedListener: (Int, String) -> Unit) {
             txtRateName.text = rate.currencyName
             setFormattedCurrencyValueWhenFieldIsNotFocused(rate)
-            setRowClickListener(onClickListener)
-            setContentChangeListener(onContentChangedListener)
+            setContentChangeListenerInEditText(onContentChangedListener)
+            setFocusChangedListenerInEditText(onEditTextFocus)
+            setRowClickListener()
         }
 
-        private fun setRowClickListener(onClickListener: (Int) -> Unit) {
-            itemView.setOnClickListener {
-                edtRateValue.requestFocusWithKeyboard()
-                onClickListener.invoke(adapterPosition)
+        private fun setFocusChangedListenerInEditText(onClickListener: (Int) -> Unit) {
+            edtRateValue.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                if (hasFocus) {
+                    onClickListener.invoke(adapterPosition)
+                }
             }
         }
 
-        private fun setContentChangeListener(onContentChangedListener: (Int, String) -> Unit) {
+        private fun setRowClickListener() {
+            itemView.setOnClickListener {
+                edtRateValue.moveCursorToEnd()
+                edtRateValue.requestFocusWithKeyboard()
+            }
+        }
+
+        private fun setContentChangeListenerInEditText(onContentChangedListener: (Int, String) -> Unit) {
             edtRateValue.onContentChange {
                 onContentChangedListener.invoke(adapterPosition, it)
                 putCursorInTheEndForFocusedField()

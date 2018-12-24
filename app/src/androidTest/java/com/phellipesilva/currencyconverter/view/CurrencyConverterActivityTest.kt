@@ -236,6 +236,23 @@ class CurrencyConverterActivityTest {
         IdlingRegistry.getInstance().unregister(viewVisibilityIdlingResource)
     }
 
+    @Test
+    fun shouldPutListRowOnTopWhenClickIsPerformedDirectlyOnEditText() {
+        startServerWithJsonFileResponse("json-responses/simple_response.json")
+        val launchActivity = activityRule.launchActivity(Intent())
+        val viewVisibilityIdlingResource = ViewVisibilityIdlingResource(launchActivity.recyclerView)
+        IdlingRegistry.getInstance().register(viewVisibilityIdlingResource)
+
+        onView(withText("162.45")).perform(click())
+
+        onView(nthChildOf(withId(R.id.recyclerView), 0)).check(matches(hasDescendant(withText("AUD"))))
+        onView(nthChildOf(withId(R.id.recyclerView), 0)).check(matches(hasDescendant(withText("162.45"))))
+        onView(nthChildOf(withId(R.id.recyclerView), 1)).check(matches(hasDescendant(withText("EUR"))))
+        onView(nthChildOf(withId(R.id.recyclerView), 1)).check(matches(hasDescendant(withText("100.00"))))
+
+        IdlingRegistry.getInstance().unregister(viewVisibilityIdlingResource)
+    }
+
     private fun startServerWithJsonFileResponse(jsonFilePath: String) {
         val json = readJsonFromResources(jsonFilePath)
         val mockResponse = MockResponse().setBody(json)

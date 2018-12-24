@@ -10,7 +10,9 @@ fun EditText.requestFocusWithKeyboard() {
     requestFocus()
     val systemService = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     systemService.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+}
 
+fun EditText.moveCursorToEnd() {
     val textLength = text.length
     this.setSelection(textLength)
 }
