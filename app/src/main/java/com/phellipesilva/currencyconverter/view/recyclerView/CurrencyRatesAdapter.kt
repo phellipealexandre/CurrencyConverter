@@ -86,13 +86,34 @@ class CurrencyRatesAdapter(
 
         fun bind(rate: Currency, onClickListener: (Int) -> Unit, onContentChangedListener: (Int, String) -> Unit) {
             txtRateName.text = rate.currencyName
-            edtRateValue.setText(DecimalFormat(doubleTwoDigitsFormat).format(rate.currencyValue))
+            setFormattedCurrencyValueWhenFieldIsNotFocused(rate)
+            setRowClickListener(onClickListener)
+            setContentChangeListener(onContentChangedListener)
+        }
+
+        private fun setRowClickListener(onClickListener: (Int) -> Unit) {
             itemView.setOnClickListener {
                 edtRateValue.requestFocusWithKeyboard()
                 onClickListener.invoke(adapterPosition)
             }
+        }
+
+        private fun setContentChangeListener(onContentChangedListener: (Int, String) -> Unit) {
             edtRateValue.onContentChange {
                 onContentChangedListener.invoke(adapterPosition, it)
+                putCursorInTheEndForFocusedField()
+            }
+        }
+
+        private fun putCursorInTheEndForFocusedField() {
+            if (edtRateValue.isFocused) {
+                edtRateValue.setSelection(edtRateValue.text.length)
+            }
+        }
+
+        private fun setFormattedCurrencyValueWhenFieldIsNotFocused(rate: Currency) {
+            if (!edtRateValue.isFocused) {
+                edtRateValue.setText(DecimalFormat(doubleTwoDigitsFormat).format(rate.currencyValue))
             }
         }
     }

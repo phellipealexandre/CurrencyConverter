@@ -181,7 +181,8 @@ class CurrencyConverterActivityTest {
         Espresso.closeSoftKeyboard()
 
         onView(nthChildOf(withId(R.id.recyclerView), 0)).check(matches(hasDescendant(withText("EUR"))))
-        onView(nthChildOf(withId(R.id.recyclerView), 0)).check(matches(hasDescendant(withText("0.00"))))
+        onView(nthChildOf(withId(R.id.recyclerView), 0)).check(matches(hasDescendant(withText(""))))
+        onView(nthChildOf(withId(R.id.recyclerView), 0)).check(matches(hasDescendant(withHint("0"))))
         onView(nthChildOf(withId(R.id.recyclerView), 1)).check(matches(hasDescendant(withText("AUD"))))
         onView(nthChildOf(withId(R.id.recyclerView), 1)).check(matches(hasDescendant(withText("0.00"))))
         onView(nthChildOf(withId(R.id.recyclerView), 2)).check(matches(hasDescendant(withText("BGN"))))
