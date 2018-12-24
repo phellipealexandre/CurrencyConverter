@@ -1,6 +1,7 @@
 package com.phellipesilva.currencyconverter.view
 
 import android.os.Bundle
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
@@ -51,7 +52,10 @@ class CurrencyConverterActivity : AppCompatActivity() {
 
     private fun initializeViewStateObserver() {
         viewModel.viewState().observe(this, Observer {
-            it.getContentIfNotHandled()?.let { Snackbar.make(coordinatorLayout, getString(it.stringMessageId), Snackbar.LENGTH_LONG).show() }
+            it.getContentIfNotHandled()?.let {
+                Snackbar.make(coordinatorLayout, getString(it.stringMessageId), Snackbar.LENGTH_LONG).show()
+                progressBar.visibility = if (it.progressVisible) View.VISIBLE else View.GONE
+            }
         })
     }
 }

@@ -15,7 +15,9 @@
             android:name=".application.CurrencyConverterApplication"
             android:theme="@style/AppTheme">
 
-        <activity android:name=".view.CurrencyConverterActivity">
+        <activity
+            android:name=".view.CurrencyConverterActivity"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

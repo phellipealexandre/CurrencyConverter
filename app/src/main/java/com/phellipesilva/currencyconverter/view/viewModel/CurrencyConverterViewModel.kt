@@ -25,7 +25,6 @@ class CurrencyConverterViewModel(
 
     private var rateOrderMask: List<String>? = null
     private var currentBaseCurrency = Currency("EUR", 100.0)
-
     private val currencyRates by lazy { currencyRepository.getCurrencyRates() }
     private val viewState = MutableLiveData<Event<ViewState>>()
 
@@ -91,6 +90,8 @@ class CurrencyConverterViewModel(
 
             val newCurrencyRates = CurrencyRates(1, currentBaseCurrency, currencyRatesMap)
             currencyRepository.updatesCurrencyRates(newCurrencyRates)
+        } else {
+            viewState.value = Event(ViewState.RECALCULATING_RATES)
         }
     }
 

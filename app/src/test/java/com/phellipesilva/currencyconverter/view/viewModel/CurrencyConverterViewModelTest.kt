@@ -118,6 +118,18 @@ class CurrencyConverterViewModelTest {
     }
 
     @Test
+    fun shouldEmitRecalculationStateWhenUpdatesOrderMaskWithZeroValueOnBaseCurrency() {
+        listOf(
+            Currency("BASE", 0.0),
+            Currency("Key3", 0.0)
+        )
+
+        currencyConverterViewModel.viewState().observeForever {
+            assertThat(it.peekContent()).isEqualTo(ViewState.RECALCULATING_RATES)
+        }
+    }
+
+    @Test
     fun shouldCallCurrencyRatesServiceTenTimesAfterPassingTenSeconds() {
         mockCurrencyRatesResponseFromServer()
 

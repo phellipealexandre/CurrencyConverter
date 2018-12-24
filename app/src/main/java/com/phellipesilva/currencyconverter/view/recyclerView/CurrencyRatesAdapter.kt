@@ -40,7 +40,7 @@ class CurrencyRatesAdapter(
 
         holder.bind(
             rate,
-            { holderPosition: Int -> moveClickedRateToFirstPositionIndex(holderPosition) },
+            { holderPosition: Int -> moveCurrencyToFirstPositionIndex(holderPosition) },
             { holderPosition: Int, value: String -> emitContentChangedEventWhenItemIsInFirstPosition(holderPosition, value) }
         )
 
@@ -69,7 +69,7 @@ class CurrencyRatesAdapter(
         }
     }
 
-    private fun moveClickedRateToFirstPositionIndex(position: Int) {
+    private fun moveCurrencyToFirstPositionIndex(position: Int) {
         val newList = LinkedList(currencyRatesList)
         val rate = newList.removeAt(position)
         newList.addFirst(rate)
