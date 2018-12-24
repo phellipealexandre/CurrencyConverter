@@ -40,10 +40,7 @@ class CurrencyConverterViewModel(
             .interval(1, TimeUnit.SECONDS)
             .switchMap { currencyRepository.fetchCurrencyRates(currentBaseCurrency) }
             .doOnNext(::initMaskAndBaseRate)
-            .subscribe(
-                { currencyRepository.updatesCurrencyRates(it) },
-                { emitsErrorState() }
-            )
+            .subscribe(currencyRepository::updatesCurrencyRates, ::emitsErrorState)
     }
 
     fun getObservableListOfCurrencies(): LiveData<List<Currency>> {
@@ -98,7 +95,7 @@ class CurrencyConverterViewModel(
         }
     }
 
-    private fun emitsErrorState() {
+    private fun emitsErrorState(throwable: Throwable) {
         viewState.postValue(ViewState.ERROR)
     }
 

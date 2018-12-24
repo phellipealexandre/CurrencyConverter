@@ -1,6 +1,8 @@
 package com.phellipesilva.currencyconverter.view
 
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -46,7 +48,11 @@ class CurrencyConverterActivity : AppCompatActivity() {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         viewModel.getObservableListOfCurrencies().observe(this, Observer {
-            it?.let { adapter.updateData(it) }
+            it?.let {
+                progressBar.visibility = GONE
+                recyclerView.visibility = VISIBLE
+                adapter.updateData(it)
+            }
         })
     }
 
