@@ -11,6 +11,7 @@ object RxUtils {
         RxJavaPlugins.setComputationSchedulerHandler { scheduler }
         RxJavaPlugins.setNewThreadSchedulerHandler { scheduler }
         RxAndroidPlugins.setMainThreadSchedulerHandler { scheduler }
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { scheduler }
     }
 
     fun resetSchedulers() {

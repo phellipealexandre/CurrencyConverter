@@ -7,10 +7,11 @@ import com.nhaarman.mockitokotlin2.*
 import com.phellipesilva.currencyconverter.database.entity.Currency
 import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.repository.CurrencyRepository
+import com.phellipesilva.currencyconverter.system.ConnectionManager
 import com.phellipesilva.currencyconverter.utils.RxUtils
 import com.phellipesilva.currencyconverter.view.state.ViewState
 import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.TestScheduler
 import org.junit.After
 import org.junit.Before
@@ -32,7 +33,10 @@ class CurrencyConverterViewModelTest {
     private lateinit var repository: CurrencyRepository
 
     @Mock
-    private lateinit var disposable: Disposable
+    private lateinit var compositeDisposable: CompositeDisposable
+
+    @Mock
+    private lateinit var connectionManager: ConnectionManager
 
     private lateinit var currencyConverterViewModel: CurrencyConverterViewModel
     private lateinit var testScheduler: TestScheduler
@@ -40,8 +44,9 @@ class CurrencyConverterViewModelTest {
     @Before
     fun setUp() {
         whenever(repository.getBaseCurrencyFromPreferences()).thenReturn(Currency("EUR", 100.0))
+        whenever(connectionManager.isOnline()).thenReturn(true)
 
-        currencyConverterViewModel = CurrencyConverterViewModel(repository, disposable)
+        currencyConverterViewModel = CurrencyConverterViewModel(repository, compositeDisposable, connectionManager)
         testScheduler = TestScheduler()
         RxUtils.overridesEnvironmentToCustomScheduler(testScheduler)
     }
@@ -62,7 +67,7 @@ class CurrencyConverterViewModelTest {
     @Test
     fun shouldInitializeViewModelWithRateStoredInPreferences() {
         whenever(repository.getBaseCurrencyFromPreferences()).thenReturn(Currency("BRL", 150.0))
-        currencyConverterViewModel = CurrencyConverterViewModel(repository, disposable)
+        currencyConverterViewModel = CurrencyConverterViewModel(repository, compositeDisposable, connectionManager)
 
         currencyConverterViewModel.startCurrencyRatesUpdate()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -87,7 +92,7 @@ class CurrencyConverterViewModelTest {
     }
 
     @Test
-    fun shouldEmitErrorStateWhenServiceCallFails() {
+    fun shouldEmitErrorStateWhenServiceCallFailsUnexpectedly() {
         val observable = Observable.error<CurrencyRates>(Exception())
         whenever(repository.fetchCurrencyRates(Currency("EUR", 100.0))).thenReturn(observable)
 
@@ -95,7 +100,20 @@ class CurrencyConverterViewModelTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         currencyConverterViewModel.viewState().observeForever {
-            assertThat(it).isEqualTo(ViewState.ERROR)
+            assertThat(it.peekContent()).isEqualTo(ViewState.UNEXPECTED_ERROR)
+        }
+    }
+
+    @Test
+    fun shouldEmitNoInternetConnectionStateWhenThereIsNoInternet() {
+        mockCurrencyRatesResponseFromServer()
+        whenever(connectionManager.isOnline()).thenReturn(false)
+
+        currencyConverterViewModel.startCurrencyRatesUpdate()
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
+        currencyConverterViewModel.viewState().observeForever {
+            assertThat(it.peekContent()).isEqualTo(ViewState.NO_INTERNET_ERROR)
         }
     }
 
@@ -305,7 +323,7 @@ class CurrencyConverterViewModelTest {
     fun shouldCancelRatesUpdateAndStartAgainWhenSettingANewMask() {
         currencyConverterViewModel.updatesRateOrderMask(listOf(Currency("BASE", 100.0)))
 
-        verify(disposable).dispose()
+        verify(compositeDisposable).clear()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         verify(repository).fetchCurrencyRates(Currency("BASE", 100.0))
@@ -326,13 +344,13 @@ class CurrencyConverterViewModelTest {
 
         currencyConverterViewModel.updateBaseCurrencyValue(currency)
 
-        verify(disposable).dispose()
+        verify(compositeDisposable).clear()
     }
 
     @Test
     fun shouldStartRatesUpdateFromServerWhenUpdatingBaseCurrencyValueIsGreaterThanZeroAndDisposableWasPreviouslyDisposed() {
         val currency = Currency("BASE", 100.0)
-        whenever(disposable.isDisposed).thenReturn(true)
+        whenever(compositeDisposable.isDisposed).thenReturn(true)
 
         currencyConverterViewModel.updateBaseCurrencyValue(currency)
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -343,7 +361,7 @@ class CurrencyConverterViewModelTest {
     @Test
     fun shouldNotStartRatesUpdateFromServerWhenObservableDisposableIsNotDisposed() {
         val currency = Currency("BASE", 100.0)
-        whenever(disposable.isDisposed).thenReturn(false)
+        whenever(compositeDisposable.isDisposed).thenReturn(false)
 
         currencyConverterViewModel.updateBaseCurrencyValue(currency)
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)

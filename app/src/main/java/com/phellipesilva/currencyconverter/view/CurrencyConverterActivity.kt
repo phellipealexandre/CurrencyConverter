@@ -58,7 +58,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
 
     private fun initializeViewStateObserver() {
         viewModel.viewState().observe(this, Observer {
-            Snackbar.make(coordinatorLayout, getString(R.string.activity_error_msg), Snackbar.LENGTH_LONG).show()
+            it.getContentIfNotHandled()?.let { Snackbar.make(coordinatorLayout, getString(it.stringMessageId), Snackbar.LENGTH_LONG).show() }
         })
     }
 }
