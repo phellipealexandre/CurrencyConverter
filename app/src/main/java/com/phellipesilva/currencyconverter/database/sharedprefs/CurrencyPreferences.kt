@@ -11,16 +11,14 @@ class CurrencyPreferences @Inject constructor(private val sharedPreferences: Sha
     private val nameKey = "currencyName"
     private val valueKey = "currencyValue"
 
-    fun getBaseCurrencyFromPreferences(): Currency {
-        val currencyName = sharedPreferences.getString(nameKey, "EUR") ?: "EUR"
-        val currencyValue = sharedPreferences.getString(valueKey, "100.0") ?: "100.0"
-        return Currency(currencyName, currencyValue.toDouble())
-    }
+    fun getBaseCurrencyFromPreferences() = Currency(
+        currencyName = sharedPreferences.getString(nameKey, "EUR") ?: "EUR",
+        currencyValue = (sharedPreferences.getString(valueKey, "100.0") ?: "100.0").toDouble()
+    )
 
-    fun saveBaseCurrencyOnSharedPrefs(currency: Currency) {
-        val editor = sharedPreferences.edit()
-        editor.putString(nameKey, currency.currencyName)
-        editor.putString(valueKey, currency.currencyValue.toString())
-        editor.apply()
+    fun saveBaseCurrencyOnSharedPrefs(currency: Currency) = with(sharedPreferences.edit()) {
+        putString(nameKey, currency.currencyName)
+        putString(valueKey, currency.currencyValue.toString())
+        apply()
     }
 }
