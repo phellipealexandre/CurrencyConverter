@@ -6,11 +6,13 @@ import com.phellipesilva.currencyconverter.database.entity.CurrencyRates
 import com.phellipesilva.currencyconverter.database.room.CurrencyDAO
 import com.phellipesilva.currencyconverter.database.sharedprefs.CurrencyPreferences
 import com.phellipesilva.currencyconverter.service.CurrencyRatesService
+import dagger.Reusable
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
+@Reusable
 class CurrencyRepository @Inject constructor(
     private val currencyRatesService: CurrencyRatesService,
     private val currencyDAO: CurrencyDAO,

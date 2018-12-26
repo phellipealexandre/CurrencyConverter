@@ -9,12 +9,13 @@ import com.phellipesilva.currencyconverter.database.room.CurrencyDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
+import javax.inject.Singleton
 
 @Module
 object DatabaseModule {
 
     @Provides
-    @Reusable
+    @Singleton
     @JvmStatic
     fun providesCurrencyRateDAO(context: Context): CurrencyDAO =
         Room.databaseBuilder(context, CurrencyDatabase::class.java, "Currency Database")
