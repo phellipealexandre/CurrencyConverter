@@ -7,6 +7,9 @@ This project considers orientation changes on the device. So I decided to use th
 
 To handle the list data I used the concept of [single source of truth](https://developer.android.com/jetpack/docs/guide#persisting_data), where the main source of data is my Room database.
 
+## Screenshot
+<img src="images/AppScreenshot.png" width="300">
+
 ## Technologies
 * Kotlin
 * RxJava2
@@ -29,4 +32,4 @@ For me, the biggest challenge to complete this project was to maintain the view 
 
 In meanwhile, all the rates are updated on every second from a server where I cannot control the order of the response's content. The strategy I used is described in the diagram below:
 
-![](images/Strategy.png)
+<img src="images/Strategy.png">
