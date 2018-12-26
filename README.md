@@ -33,3 +33,21 @@ For me, the biggest challenge to complete this project was to maintain the view 
 In meanwhile, all the rates are updated on every second from a server where I cannot control the order of the response's content. The strategy I used is described in the diagram below:
 
 ![](images/Strategy.png)
+
+## Recommendations to run
+Its recommended to disable the device animations when running the espresso tests.
+We can do it on the developer options or just running the ADB commands below:
+
+```
+adb shell settings put global window_animation_scale 0
+adb shell settings put global transition_animation_scale 0
+adb shell settings put global animator_duration_scale 0
+```
+
+To make the animations come back to normal, you can run:
+
+```
+adb shell settings put global window_animation_scale 1
+adb shell settings put global transition_animation_scale 1
+adb shell settings put global animator_duration_scale 1
+```
