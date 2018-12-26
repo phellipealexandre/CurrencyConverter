@@ -36,7 +36,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
 
     private fun initializeRecyclerView() {
         val adapter = CurrencyRatesAdapter(this)
-        adapter.setOnPositionChangedListener(viewModel::updatesRateOrderMask)
+        adapter.setOnPositionChangedListener(viewModel::updateRateOrderMask)
         adapter.setOnBaseValueChangedListener(viewModel::updateBaseCurrencyValue)
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false

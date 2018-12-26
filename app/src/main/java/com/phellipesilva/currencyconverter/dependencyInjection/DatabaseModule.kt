@@ -18,7 +18,7 @@ object DatabaseModule {
     @Singleton
     @JvmStatic
     fun providesCurrencyRateDAO(context: Context): CurrencyDAO =
-        Room.databaseBuilder(context, CurrencyDatabase::class.java, "Currency Database")
+        Room.databaseBuilder(context, CurrencyDatabase::class.java, "CurrencyDatabase")
             .build()
             .getCurrencyDAO()
 

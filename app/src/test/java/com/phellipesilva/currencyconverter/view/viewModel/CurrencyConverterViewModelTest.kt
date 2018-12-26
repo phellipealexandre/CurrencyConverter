@@ -214,7 +214,7 @@ class CurrencyConverterViewModelTest {
             mapOf("Key1" to 1.0, "Key2" to 1.0, "Key3" to 1.0, "Key4" to 1.0 ,"Key5" to 1.0)
         )
 
-        currencyConverterViewModel.updatesRateOrderMask(
+        currencyConverterViewModel.updateRateOrderMask(
             listOf(
                 Currency("EUR", 100.0),
                 Currency("Key5", 100.0),
@@ -245,7 +245,7 @@ class CurrencyConverterViewModelTest {
             mapOf("Key1" to 1.0, "Key2" to 1.0, "Key3" to 1.0, "Key4" to 1.0 ,"Key5" to 1.0)
         )
 
-        currencyConverterViewModel.updatesRateOrderMask(
+        currencyConverterViewModel.updateRateOrderMask(
             listOf(
                 Currency("EUR", 100.0),
                 Currency("Key5", 100.0),
@@ -267,7 +267,7 @@ class CurrencyConverterViewModelTest {
 
     @Test
     fun shouldFetchNewCurrencyRatesWithFirstElementOfMask() {
-        currencyConverterViewModel.updatesRateOrderMask(
+        currencyConverterViewModel.updateRateOrderMask(
             listOf(
                 Currency("BASE", 101.0),
                 Currency("Key3", 1.8)
@@ -281,7 +281,7 @@ class CurrencyConverterViewModelTest {
 
     @Test
     fun shouldProcessAndUpdateDatabaseWithNewCurrencyRatesWhenUpdateMaskAndBaseValueIsGreaterThanZero() {
-        currencyConverterViewModel.updatesRateOrderMask(
+        currencyConverterViewModel.updateRateOrderMask(
             listOf(
                 Currency("BASE", 101.0),
                 Currency("Key3", 101.0)
@@ -299,7 +299,7 @@ class CurrencyConverterViewModelTest {
 
     @Test
     fun shouldNotUpdateDatabaseWithNewCurrencyRatesWhenBaseValueIsEqualsZero() {
-        currencyConverterViewModel.updatesRateOrderMask(
+        currencyConverterViewModel.updateRateOrderMask(
             listOf(
                 Currency("BASE", 0.0),
                 Currency("Key3", 0.0)
@@ -311,7 +311,7 @@ class CurrencyConverterViewModelTest {
 
     @Test
     fun shouldProcessNewCurrencyRatesFromMaskValueToHaveTheCurrencyValueDividedByBaseValue() {
-        currencyConverterViewModel.updatesRateOrderMask(
+        currencyConverterViewModel.updateRateOrderMask(
             listOf(
                 Currency("BASE", 100.0),
                 Currency("Key1", 180.0),
@@ -333,7 +333,7 @@ class CurrencyConverterViewModelTest {
 
     @Test
     fun shouldCancelRatesUpdateAndStartAgainWhenSettingANewMask() {
-        currencyConverterViewModel.updatesRateOrderMask(listOf(Currency("BASE", 100.0)))
+        currencyConverterViewModel.updateRateOrderMask(listOf(Currency("BASE", 100.0)))
 
         verify(compositeDisposable).clear()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)

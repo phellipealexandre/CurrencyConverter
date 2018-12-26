@@ -47,7 +47,7 @@ class CurrencyConverterViewModel(
             .switchMap { currencyRepository.fetchCurrencyRates(currentBaseCurrency) }
             .doOnNext(::initMaskAndBaseRate)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(currencyRepository::updatesCurrencyRates, ::emitsErrorState)
+            .subscribe(currencyRepository::updatesCurrencyRates, ::emitErrorStateEvent)
 
         compositeDisposable.add(disposable)
     }
@@ -61,7 +61,7 @@ class CurrencyConverterViewModel(
         }
     }
 
-    fun updatesRateOrderMask(newMask: List<Currency>) {
+    fun updateRateOrderMask(newMask: List<Currency>) {
         this.rateOrderMask = newMask.map { it.currencyName }
         this.currentBaseCurrency = newMask.first()
 
@@ -106,12 +106,12 @@ class CurrencyConverterViewModel(
         }
     }
 
-    private fun emitsErrorState(throwable: Throwable) {
+    private fun emitErrorStateEvent(throwable: Throwable) {
         Timber.e(throwable)
         viewState.value = Event(ViewState.UNEXPECTED_ERROR)
     }
 
-    private fun emitsNoInternetConnectionState() {
+    private fun emitNoInternetConnectionStateEvent() {
         Timber.e("No Internet Connection")
         viewState.value = Event(ViewState.NO_INTERNET_ERROR)
     }
@@ -119,7 +119,7 @@ class CurrencyConverterViewModel(
     private fun handleInternetConnectionBeforeSubscribe(it: Disposable) {
         if (!connectionManager.isOnline()) {
             it.dispose()
-            emitsNoInternetConnectionState()
+            emitNoInternetConnectionStateEvent()
         }
     }
 
